@@ -1,33 +1,25 @@
 #!/bin/bash
-# Meta Self-Improvement Error Detector Hook
-# Triggers on PostToolUse for Bash to detect infrastructure errors
-# Reads CLAUDE_TOOL_OUTPUT environment variable
+# Meta Self-Improvement Error Detector Hook (Optional)
+# Conservative detector for explicit infrastructure failures only.
+# Reads CLAUDE_TOOL_OUTPUT (when provided by PostToolUse).
 
 set -e
 
 OUTPUT="${CLAUDE_TOOL_OUTPUT:-}"
 
+# If hook context didn't provide output, do nothing.
+[ -n "$OUTPUT" ] || exit 0
+
 ERROR_PATTERNS=(
-    "hook"
-    "skill"
-    "SKILL.md"
-    "AGENTS.md"
-    "SOUL.md"
-    "TOOLS.md"
-    "MEMORY.md"
-    "CLAUDE.md"
+    "failed to load skill"
     "frontmatter"
-    "yaml"
+    "yaml parse"
     "metadata"
-    "not found"
-    "failed to load"
-    "context length"
-    "token limit"
-    "truncated"
-    "conflict"
-    "deprecated"
-    "stale"
+    "context length exceeded"
+    "token limit exceeded"
+    "prompt is too long"
     "malformed"
+    "No such file or directory"
 )
 
 contains_error=false
@@ -41,15 +33,9 @@ done
 if [ "$contains_error" = true ]; then
     cat << 'EOF'
 <meta-error-detected>
-An infrastructure-related term was detected in command output. Consider logging to .learnings/ if:
-- Prompt file instruction was misinterpreted → LEARNINGS.md (instruction_ambiguity)
-- Hook script failed or produced no output → META_ISSUES.md [META-YYYYMMDD-XXX]
-- Skill didn't activate when it should have → META_ISSUES.md with skill_gap area
-- Rules conflict across files → LEARNINGS.md (rule_conflict)
-- Context was truncated or token limit hit → LEARNINGS.md (context_bloat)
-- Memory entry references stale or deleted content → LEARNINGS.md (prompt_drift)
-
-Meta-learnings modify infrastructure directly. Apply fixes to the affected files.
+A high-signal infrastructure failure pattern was detected.
+Log only if the issue required investigation or is likely to recur.
+Prefer minimal, reviewed fixes for shared prompt files and hooks.
 </meta-error-detected>
 EOF
 fi

@@ -201,6 +201,8 @@ The activator is designed to be lightweight:
 - Treat `CLAUDE_TOOL_OUTPUT` as potentially sensitive; do not log verbatim
 - All scripts are opt-in
 - Recommended default: enable `UserPromptSubmit` only; add `PostToolUse` when you want supply chain disruption detection
+- No credentials, payment tokens, or procurement transaction permissions are required by this skill
+- This skill does not place orders, execute purchases, or call external commerce APIs
 
 ## Disabling Hooks
 

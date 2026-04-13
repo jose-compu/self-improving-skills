@@ -14,6 +14,7 @@ Injects a reminder to evaluate agent infrastructure learnings during agent boots
 - Adds a meta-specific reminder block to check `.learnings/` for infrastructure entries
 - Prompts the agent to log prompt file issues, hook failures, skill activation problems, rule conflicts, context bloat, and memory staleness
 - Skips subagent sessions to avoid noise
+- Reminder-only behavior: does not modify files or call network resources
 
 ## Reminder Content
 

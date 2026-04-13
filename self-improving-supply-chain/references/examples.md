@@ -64,7 +64,7 @@ Current inventory covers 5 weeks of production. With the new 14-week lead time, 
 at 3-4x standard cost.
 
 ### Suggested Action
-1. Immediately place bridge order at current pricing before lead time extends further
+1. Recommend bridge replenishment order for human approval before lead time extends further
 2. Begin qualification of Taiwan Semiconductor Components as alternate source
 3. Evaluate pin-compatible alternatives (MCU-7210, MCU-7250) for design flexibility
 4. Add supplier diversification policy: no single-source for components with >$50K annual spend

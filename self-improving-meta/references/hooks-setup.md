@@ -4,15 +4,15 @@ Configure automatic meta self-improvement triggers for AI coding agents.
 
 ## Overview
 
-Hooks enable proactive infrastructure-pattern capture by injecting reminders at key moments:
-- **UserPromptSubmit**: Reminder after each prompt to evaluate meta learnings
-- **PostToolUse (Bash)**: Error detection when hooks, skills, or prompt files have issues
+Hooks can help capture infrastructure learnings with minimal overhead:
+- **UserPromptSubmit** (recommended): Reminder after each prompt to evaluate meta learnings
+- **PostToolUse (Bash)** (optional): Conservative error-pattern reminder based on command output in trusted environments
 
 ## Claude Code Setup
 
 ### Option 1: Project-Level Configuration
 
-Create `.claude/settings.json` in your project root:
+Create `.claude/settings.json` in your project root (activator-only recommended):
 
 ```json
 {
@@ -27,7 +27,18 @@ Create `.claude/settings.json` in your project root:
           }
         ]
       }
-    ],
+    ]
+  }
+}
+```
+
+### Optional: Add PostToolUse Error Detector
+
+Enable this only when you explicitly want command-output pattern checks:
+
+```json
+{
+  "hooks": {
     "PostToolUse": [
       {
         "matcher": "Bash",
@@ -197,7 +208,7 @@ The activator is designed to be lightweight:
 
 - Hook scripts run with the same permissions as the agent
 - Scripts only output text; they don't modify files or run commands
-- Error detector reads `CLAUDE_TOOL_OUTPUT` environment variable
+- Error detector reads `CLAUDE_TOOL_OUTPUT` only when PostToolUse is enabled
 - Treat `CLAUDE_TOOL_OUTPUT` as potentially sensitive; do not log verbatim
 - All scripts are opt-in
 - Recommended default: enable `UserPromptSubmit` only; add `PostToolUse` when you want infrastructure error detection

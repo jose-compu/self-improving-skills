@@ -13,6 +13,7 @@ Injects a reminder to evaluate supply chain learnings during agent bootstrap.
 - Fires on `agent:bootstrap` (before workspace files are injected)
 - Adds a supply chain-specific reminder block to check `.learnings/` for relevant entries
 - Prompts the agent to log stockouts, delivery delays, supplier failures, quality rejections, forecast misses, demand signal shifts, and capacity breaches
+- Reminder-only behavior: does not place orders, execute purchases, or call external payment/commerce services
 
 ## Reminder Content
 

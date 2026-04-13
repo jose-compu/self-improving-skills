@@ -1,11 +1,14 @@
 #!/bin/bash
-# Supply Chain Self-Improvement Error Detector Hook
-# Triggers on PostToolUse for Bash to detect supply chain disruptions and issues
-# Reads CLAUDE_TOOL_OUTPUT environment variable
+# Supply Chain Self-Improvement Error Detector Hook (Optional)
+# Detects operational disruption terms in PostToolUse output.
+# Reads CLAUDE_TOOL_OUTPUT only when provided by the hook context.
 
 set -e
 
 OUTPUT="${CLAUDE_TOOL_OUTPUT:-}"
+
+# If hook context didn't provide output, do nothing.
+[ -n "$OUTPUT" ] || exit 0
 
 ERROR_PATTERNS=(
     "stockout"
@@ -69,6 +72,7 @@ A supply chain issue was detected in command output. Consider logging to .learni
 - Demand shift not captured by planning → LEARNINGS.md (demand_signal_shift)
 
 Include impact metrics (units, cost, days affected). Specify area tag.
+This reminder is documentation-only and does not execute any procurement or purchasing action.
 </supply-chain-disruption-detected>
 EOF
 fi
