@@ -1,52 +1,33 @@
 #!/bin/bash
-# Security Self-Improvement Error Detector Hook
-# Triggers on PostToolUse for Bash to detect security-relevant patterns
-# Reads CLAUDE_TOOL_OUTPUT environment variable
+# Security Self-Improvement Error Detector Hook (Optional)
+# Conservative detector for high-signal security failures only.
+# Reads CLAUDE_TOOL_OUTPUT (when provided by PostToolUse).
 
 set -e
 
 OUTPUT="${CLAUDE_TOOL_OUTPUT:-}"
 
+# If hook context didn't provide output, do nothing.
+[ -n "$OUTPUT" ] || exit 0
+
 SECURITY_PATTERNS=(
     "CVE-"
-    "vulnerability"
     "CRITICAL"
+    "HIGH severity"
     "unauthorized"
-    "Unauthorized"
     "forbidden"
-    "Forbidden"
-    "secret"
-    "token"
-    "password"
-    "credential"
-    "injection"
-    "XSS"
-    "CSRF"
-    "SSL"
-    "certificate expired"
-    "certificate verify failed"
-    "Permission denied"
-    "Access denied"
     "authentication failed"
-    "auth failure"
     "invalid token"
     "expired token"
-    "CORS"
-    "insecure"
-    "plaintext"
-    "unencrypted"
+    "certificate expired"
+    "certificate verify failed"
     "privilege escalation"
-    "brute force"
-    "rate limit"
-    "SQL error"
+    "SQL injection"
     "command injection"
     "path traversal"
-    "directory traversal"
     "open redirect"
-    "ssrf"
     "SSRF"
     "XXE"
-    "deserialization"
 )
 
 contains_security_pattern=false
@@ -62,14 +43,12 @@ done
 if [ "$contains_security_pattern" = true ]; then
     cat << EOF
 <security-finding-detected>
-Security-relevant pattern detected in command output: "$matched_pattern"
+High-signal security pattern detected in command output: "$matched_pattern"
 
-Consider logging to .learnings/ if:
-- A vulnerability or CVE was identified
-- Secrets or credentials appeared in output (REDACT before logging)
-- An access control or authentication issue was revealed
-- A misconfiguration or insecure default was found
-- A compliance-relevant finding was discovered
+Log only when the finding required investigation or is likely to recur.
+- Vulnerability/CVE identified
+- Access-control or authentication issue confirmed
+- Critical transport/authn/authz failure observed
 
 CRITICAL: NEVER log actual secrets, credentials, tokens, or PII.
 Use REDACTED_* placeholders. Describe the type, not the content.

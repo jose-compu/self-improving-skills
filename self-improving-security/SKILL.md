@@ -15,7 +15,7 @@ Log security learnings, incidents, and compliance findings to markdown files for
 |----------------|---------------|
 | API keys | `REDACTED_API_KEY` |
 | Passwords | `REDACTED_PASSWORD` |
-| Tokens (JWT, OAuth) | `REDACTED_TOKEN` |
+| Access tokens (JWT, bearer, session) | `REDACTED_TOKEN` |
 | Private keys | `REDACTED_PRIVATE_KEY` |
 | Connection strings | `REDACTED_CONNECTION_STRING` |
 | PII (emails, SSNs) | `REDACTED_PII` |
@@ -38,6 +38,8 @@ mkdir -p .learnings
 Never overwrite existing files. This is a no-op if `.learnings/` is already initialised.
 
 If you want automatic reminders or setup assistance, use the opt-in hook workflow described in [Hook Integration](#hook-integration).
+
+No credentials or access tokens are required by this skill.
 
 ## Quick Reference
 
@@ -459,6 +461,10 @@ grep -h "CVE:" .learnings/*.md | sort -u
 ## Hook Integration
 
 Enable automatic reminders through agent hooks. This is **opt-in**.
+
+### Conservative Mode (Recommended)
+- Default to manual logging (no hooks); if reminders are useful, enable `UserPromptSubmit` with `scripts/activator.sh` only.
+- Enable `PostToolUse` (`scripts/error-detector.sh`) only in trusted environments when you explicitly want command-output pattern checks.
 
 ### Quick Setup (Claude Code / Codex)
 

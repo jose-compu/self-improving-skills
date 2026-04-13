@@ -4,15 +4,15 @@ Configure automatic security self-improvement triggers for AI coding agents.
 
 ## Overview
 
-Hooks enable proactive security finding capture by injecting reminders at key moments:
-- **UserPromptSubmit**: Reminder after each prompt to evaluate security findings
-- **PostToolUse (Bash)**: Detection when security-relevant patterns appear in command output
+Hooks can help capture security findings with minimal overhead:
+- **UserPromptSubmit** (recommended): Reminder after each prompt to evaluate security findings
+- **PostToolUse (Bash)** (optional): Detection when high-signal security patterns appear in command output (trusted environments only)
 
 ## Claude Code Setup
 
 ### Option 1: Project-Level Configuration
 
-Create `.claude/settings.json` in your project root:
+Create `.claude/settings.json` in your project root (activator-only recommended):
 
 ```json
 {
@@ -27,7 +27,18 @@ Create `.claude/settings.json` in your project root:
           }
         ]
       }
-    ],
+    ]
+  }
+}
+```
+
+### Optional: Add PostToolUse Error Detector
+
+Enable this only when you explicitly want command-output pattern checks in trusted environments:
+
+```json
+{
+  "hooks": {
     "PostToolUse": [
       {
         "matcher": "Bash",
@@ -206,6 +217,7 @@ The activator is designed to be lightweight:
 - Treat `CLAUDE_TOOL_OUTPUT` as potentially sensitive — **never log or forward it verbatim**
 - All scripts are opt-in (you must configure them explicitly)
 - Recommended default: enable `UserPromptSubmit` only
+- No credentials or access tokens are required by this skill
 
 ## Disabling Hooks
 
