@@ -568,9 +568,7 @@ When an operations learning is valuable enough to become a reusable skill, extra
 
 ### Extraction Detection Triggers
 
-**In conversation**: "This incident keeps happening", "Save this runbook as a skill", "We keep doing this manually".
-
-**In entries**: Multiple `See Also` links, high priority + resolved, same `Pattern-Key` across services.
+Use conversation signals ("This incident keeps happening", "Save this runbook as a skill") and entry signals (multiple `See Also`, high-priority resolved items, recurring `Pattern-Key`) to identify extraction candidates.
 
 ## Multi-Agent Support
 
@@ -593,11 +591,50 @@ When an operations learning is valuable enough to become a reusable skill, extra
 8. **Log immediately** — incident context fades fast after resolution
 9. **Include timelines** — timestamps are critical for postmortems and pattern detection
 10. **Measure DORA metrics** — track deployment frequency, lead time, change failure rate, and MTTR
-11. **Distinguish symptoms from root causes** — an alert firing is the symptom, not the cause
-12. **Review before on-call shifts** — check `.learnings/` for known issues and recent patterns
+11. **Review before on-call shifts** — check `.learnings/` for known issues and recent patterns
 
 ## Gitignore Options
 
 **Keep local** (per-team): add `.learnings/` to `.gitignore`.
 **Track in repo** (org-wide): don't add to `.gitignore`.
 **Hybrid**: ignore `*.md` entries, keep `.gitkeep`.
+
+## Stackability Contract (Standalone + Multi-Skill)
+
+This skill is standalone-compatible and stackable with other self-improving skills.
+
+### Namespaced Logging (recommended for 2+ skills)
+- Namespace for this skill: `.learnings/operations/`
+- Keep current standalone behavior if you prefer flat files.
+- Optional shared index for all skills: `.learnings/INDEX.md`
+
+### Required Metadata
+Every new entry must include:
+
+```markdown
+**Skill**: operations
+```
+
+### Hook Arbitration (when 2+ skills are enabled)
+- Use one dispatcher hook as the single entrypoint.
+- Dispatcher responsibilities: route by matcher, dedupe repeated events, and rate-limit reminders.
+- Suggested defaults: dedupe key = `event + matcher + file + 5m_window`; max 1 reminder per skill every 5 minutes.
+
+### Narrow Matcher Scope (operations)
+Only trigger this skill automatically for operations signals such as:
+- `incident|on-call|runbook|slo breach|error budget`
+- `mttr|postmortem|rollback|service degradation`
+- explicit operations intent in user prompt
+
+### Cross-Skill Precedence
+When guidance conflicts, apply:
+1. `security`
+2. `engineering`
+3. `coding`
+4. `ai`
+5. user-explicit domain skill
+6. `meta` as tie-breaker
+
+### Ownership Rules
+- This skill writes only to `.learnings/operations/` in stackable mode.
+- It may read other skill folders for cross-linking, but should not rewrite their entries.

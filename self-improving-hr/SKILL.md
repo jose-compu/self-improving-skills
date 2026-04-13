@@ -555,14 +555,11 @@ When an HR learning is valuable enough to become a reusable skill, extract it.
    ```
 3. **Customize SKILL.md**: Fill in template with HR-specific content
 4. **Update learning**: Set status to `promoted_to_skill`, add `Skill-Path`
-5. **Verify**: Read skill in fresh session to ensure it's self-contained
-6. **Confirm PII-free**: Review extracted skill for any accidental PII
+5. **Verify**: Read skill in fresh session and confirm it is PII-free
 
 ### Extraction Detection Triggers
 
-**In conversation**: "This compliance issue keeps coming up", "Save this onboarding process as a skill", "We keep missing this deadline".
-
-**In entries**: Multiple `See Also` links, high priority + resolved, `compliance_risk` or `policy_gap` with broad applicability.
+Use conversation signals ("This compliance issue keeps coming up", "Save this onboarding process as a skill") and entry signals (multiple `See Also`, high-priority resolved items, recurring `compliance_risk`/`policy_gap`) to identify extraction candidates.
 
 ## Multi-Agent Support
 
@@ -579,11 +576,9 @@ When an HR learning is valuable enough to become a reusable skill, extract it.
 2. **Anonymize always** — never include names, SSNs, salaries, or medical info
 3. **Specify jurisdiction** — federal vs. state vs. local matters enormously
 4. **Note the regulation** — cite FMLA, ADA, EEOC, etc. by name
-5. **Include affected headcount** — "3 of 45 employees" gives context without PII
-6. **Follow chain of approval** — HR policy changes need sign-off before implementation
-7. **Check multiple jurisdictions** — a compliant federal policy may violate state law
-8. **Promote aggressively** — if a compliance gap recurs twice, it needs a calendar entry
-9. **Review before audits** — check `.learnings/` for open compliance items before any audit
+5. **Follow chain of approval** — HR policy changes need sign-off before implementation
+6. **Check multiple jurisdictions** — a compliant federal policy may violate state law
+7. **Review before audits** — check `.learnings/` for open compliance items
 
 ## Gitignore Options
 
@@ -601,4 +596,44 @@ Don't add to .gitignore — learnings become shared knowledge.
 !.learnings/.gitkeep
 ```
 
-**Recommendation**: For HR data, default to `.learnings/` local and untracked. Share patterns through promoted policy documents rather than raw entries.
+**Recommendation**: For HR data, default to `.learnings/` local and untracked.
+
+## Stackability Contract (Standalone + Multi-Skill)
+
+This skill is standalone-compatible and stackable with other self-improving skills.
+
+### Namespaced Logging (recommended for 2+ skills)
+- Namespace for this skill: `.learnings/hr/`
+- Keep current standalone behavior if you prefer flat files.
+- Optional shared index for all skills: `.learnings/INDEX.md`
+
+### Required Metadata
+Every new entry must include:
+
+```markdown
+**Skill**: hr
+```
+
+### Hook Arbitration (when 2+ skills are enabled)
+- Use one dispatcher hook as the single entrypoint.
+- Dispatcher responsibilities: route by matcher, dedupe repeated events, and rate-limit reminders.
+- Suggested defaults: dedupe key = `event + matcher + file + 5m_window`; max 1 reminder per skill every 5 minutes.
+
+### Narrow Matcher Scope (hr)
+Only trigger this skill automatically for HR signals such as:
+- `policy violation|onboarding|offboarding|performance review`
+- `payroll issue|retention risk|compliance training|workforce planning`
+- explicit HR intent in user prompt
+
+### Cross-Skill Precedence
+When guidance conflicts, apply:
+1. `security`
+2. `engineering`
+3. `coding`
+4. `ai`
+5. user-explicit domain skill
+6. `meta` as tie-breaker
+
+### Ownership Rules
+- This skill writes only to `.learnings/hr/` in stackable mode.
+- It may read other skill folders for cross-linking, but should not rewrite their entries.

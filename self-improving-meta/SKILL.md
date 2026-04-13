@@ -5,9 +5,9 @@ description: "Improves the agent infrastructure itself — core prompt files (AG
 
 # Self-Improving Meta Skill
 
-Log infrastructure learnings, meta issues, and feature requests to markdown files for continuous improvement of the agent system itself. Captures prompt drift, rule conflicts, skill gaps, hook failures, context bloat, and instruction ambiguity. Important learnings get promoted directly into the files they govern — prompt files, hook code, rule files, skill templates, and memory policies.
+Log infrastructure learnings, meta issues, and feature requests to markdown files for continuous improvement of the agent system itself. Captures prompt drift, rule conflicts, skill gaps, hook failures, context bloat, and instruction ambiguity. Important learnings may be promoted into the files they govern — prompt files, hook code, rule files, skill templates, and memory policies — after explicit human review.
 
-This is the skill that improves skills. Its learnings modify the infrastructure that all other skills depend on.
+This is the skill that improves skills. Its learnings influence infrastructure that all other skills depend on, so changes should be reviewed conservatively.
 
 ## First-Use Initialisation
 
@@ -24,7 +24,14 @@ Never overwrite existing files. This is a no-op if `.learnings/` is already init
 
 Do not log secrets, tokens, private keys, or environment variables. Prefer short summaries or redacted excerpts over raw file contents.
 
-If you want automatic reminders, use the opt-in hook workflow described in [Hook Integration](#hook-integration).
+Use a manual-first workflow by default. If you want reminders, use the opt-in hook workflow described in [Hook Integration](#hook-integration).
+
+## Safety Boundaries
+
+- Do not auto-modify core prompt files (`AGENTS.md`, `SOUL.md`, `TOOLS.md`, `MEMORY.md`) without explicit user approval.
+- Prefer proposing a minimal patch and rationale before applying infrastructure changes.
+- Treat hook output as sensitive; avoid logging raw command output or full transcripts.
+- Keep fixes scoped to the identified issue; avoid broad refactors during incident response.
 
 ## Quick Reference
 
@@ -88,7 +95,7 @@ Then create the log files (or copy from `assets/`):
 
 ### Promotion Targets
 
-When meta-learnings prove broadly applicable, promote them directly into the files they govern:
+When meta-learnings prove broadly applicable, promote them to the files they govern with explicit user approval:
 
 | Learning Type | Promote To | Example |
 |---------------|------------|---------|
@@ -283,7 +290,7 @@ Other status values:
 
 ## Promoting to Project Memory
 
-Meta-learnings are special: they promote directly into the files they govern. When you improve a prompt file, that improvement affects all future sessions. When you fix a hook, that fix propagates to all bootstraps.
+Meta-learnings are special: they can affect shared infrastructure. When you improve a prompt file, that improvement affects future sessions. When you fix a hook, that fix can propagate to all bootstraps. Use review gates.
 
 ### When to Promote
 
@@ -307,9 +314,9 @@ Meta-learnings are special: they promote directly into the files they govern. Wh
 ### How to Promote
 
 1. **Distill** the learning into a concrete fix
-2. **Apply** to the affected file directly
+2. **Prepare** a minimal patch for the affected file
 3. **Test** in a fresh session to verify the fix works
-4. **Update** original entry:
+4. **Apply after approval**, then update original entry:
    - Change `**Status**: pending` → `**Status**: promoted`
    - Add `**Promoted**: AGENTS.md (delegation section rewrite)` (or equivalent)
 
@@ -455,7 +462,13 @@ Use to filter learnings by infrastructure domain:
 
 ## Hook Integration
 
-Enable automatic reminders through agent hooks. This is **opt-in**.
+Enable reminders through agent hooks only when needed. This is **opt-in**.
+
+### Conservative Mode (Recommended)
+
+- Default to **no hooks** and log manually.
+- If reminders are useful, enable `UserPromptSubmit` with `scripts/activator.sh` only.
+- Enable `PostToolUse` (`scripts/error-detector.sh`) only in trusted environments when you explicitly want command-output pattern checks.
 
 ### Quick Setup (Claude Code / Codex)
 
@@ -584,3 +597,43 @@ Don't add to .gitignore — learnings become shared knowledge.
 .learnings/*.md
 !.learnings/.gitkeep
 ```
+
+## Stackability Contract (Standalone + Multi-Skill)
+
+This skill is standalone-compatible and stackable with other self-improving skills.
+
+### Namespaced Logging (recommended for 2+ skills)
+- Namespace for this skill: `.learnings/meta/`
+- Keep current standalone behavior if you prefer flat files.
+- Optional shared index for all skills: `.learnings/INDEX.md`
+
+### Required Metadata
+Every new entry must include:
+
+```markdown
+**Skill**: meta
+```
+
+### Hook Arbitration (when 2+ skills are enabled)
+- Use one dispatcher hook as the single entrypoint.
+- Dispatcher responsibilities: route by matcher, dedupe repeated events, and rate-limit reminders.
+- Suggested defaults: dedupe key = `event + matcher + file + 5m_window`; max 1 reminder per skill every 5 minutes.
+
+### Narrow Matcher Scope (meta)
+Only trigger this skill automatically for meta orchestration signals such as:
+- `cross-skill conflict|routing ambiguity|policy overlap|dedupe`
+- `learning loop quality|stackability issue|prompt governance`
+- explicit meta intent in user prompt
+
+### Cross-Skill Precedence
+When guidance conflicts, apply:
+1. `security`
+2. `engineering`
+3. `coding`
+4. `ai`
+5. user-explicit domain skill
+6. `meta` as tie-breaker
+
+### Ownership Rules
+- This skill writes only to `.learnings/meta/` in stackable mode.
+- It may read other skill folders for cross-linking, but should not rewrite their entries.

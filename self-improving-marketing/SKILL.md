@@ -564,7 +564,7 @@ When a marketing learning is valuable enough to become a reusable skill, extract
 
 ### Extraction Detection Triggers
 
-**In conversation**: "This campaign pattern keeps working", "Save this as a playbook", "We keep making this attribution mistake", "Every launch has this problem".
+Use conversation signals ("This campaign pattern keeps working", "Save this as a playbook") to identify extraction candidates.
 
 ## Multi-Agent Support
 
@@ -586,7 +586,6 @@ When a marketing learning is valuable enough to become a reusable skill, extract
 7. **Review personas quarterly** — audience needs and behaviors shift; validate with data
 8. **Audit brand consistency monthly** — check all active assets against current brand guidelines
 9. **Promote aggressively** — if a messaging pattern works across 3+ campaigns, codify it
-10. **Separate correlation from causation** — seasonal trends, market shifts, and platform changes confound results
 
 ## Gitignore Options
 
@@ -599,3 +598,43 @@ When a marketing learning is valuable enough to become a reusable skill, extract
 Don't add to .gitignore — learnings become shared marketing knowledge.
 
 **Hybrid** (track templates, ignore entries): add `.learnings/*.md` and `!.learnings/.gitkeep` to `.gitignore`.
+
+## Stackability Contract (Standalone + Multi-Skill)
+
+This skill is standalone-compatible and stackable with other self-improving skills.
+
+### Namespaced Logging (recommended for 2+ skills)
+- Namespace for this skill: `.learnings/marketing/`
+- Keep current standalone behavior if you prefer flat files.
+- Optional shared index for all skills: `.learnings/INDEX.md`
+
+### Required Metadata
+Every new entry must include:
+
+```markdown
+**Skill**: marketing
+```
+
+### Hook Arbitration (when 2+ skills are enabled)
+- Use one dispatcher hook as the single entrypoint.
+- Dispatcher responsibilities: route by matcher, dedupe repeated events, and rate-limit reminders.
+- Suggested defaults: dedupe key = `event + matcher + file + 5m_window`; max 1 reminder per skill every 5 minutes.
+
+### Narrow Matcher Scope (marketing)
+Only trigger this skill automatically for marketing signals such as:
+- `campaign|ctr|conversion|attribution|creative test`
+- `persona|positioning|channel mix|cac|roas`
+- explicit marketing intent in user prompt
+
+### Cross-Skill Precedence
+When guidance conflicts, apply:
+1. `security`
+2. `engineering`
+3. `coding`
+4. `ai`
+5. user-explicit domain skill
+6. `meta` as tie-breaker
+
+### Ownership Rules
+- This skill writes only to `.learnings/marketing/` in stackable mode.
+- It may read other skill folders for cross-linking, but should not rewrite their entries.

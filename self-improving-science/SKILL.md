@@ -557,3 +557,43 @@ grep -B5 "Priority\*\*: high" .learnings/*.md | grep "^## \["
 | OpenClaw | Workspace injection | See OpenClaw Setup above |
 
 Apply self-improvement when you: discover data leakage, get irreproducible results, misapply a statistical test, find methodology flaws, hit training errors, or learn dataset quirks.
+
+## Stackability Contract (Standalone + Multi-Skill)
+
+This skill is standalone-compatible and stackable with other self-improving skills.
+
+### Namespaced Logging (recommended for 2+ skills)
+- Namespace for this skill: `.learnings/science/`
+- Keep current standalone behavior if you prefer flat files.
+- Optional shared index for all skills: `.learnings/INDEX.md`
+
+### Required Metadata
+Every new entry must include:
+
+```markdown
+**Skill**: science
+```
+
+### Hook Arbitration (when 2+ skills are enabled)
+- Use one dispatcher hook as the single entrypoint.
+- Dispatcher responsibilities: route by matcher, dedupe repeated events, and rate-limit reminders.
+- Suggested defaults: dedupe key = `event + matcher + file + 5m_window`; max 1 reminder per skill every 5 minutes.
+
+### Narrow Matcher Scope (science)
+Only trigger this skill automatically for science signals such as:
+- `experiment|hypothesis|p-value|confidence interval|reproducibility`
+- `dataset shift|data leakage|methodology flaw|benchmark drift`
+- explicit science intent in user prompt
+
+### Cross-Skill Precedence
+When guidance conflicts, apply:
+1. `security`
+2. `engineering`
+3. `coding`
+4. `ai`
+5. user-explicit domain skill
+6. `meta` as tie-breaker
+
+### Ownership Rules
+- This skill writes only to `.learnings/science/` in stackable mode.
+- It may read other skill folders for cross-linking, but should not rewrite their entries.

@@ -596,3 +596,43 @@ When a robotics learning is valuable enough to become reusable, extract it.
 | Codex CLI | Hooks (same pattern) | Automatic via hook scripts |
 | GitHub Copilot | Manual (`.github/copilot-instructions.md`) | Manual review |
 | OpenClaw | Workspace injection + inter-agent messaging | Via sessions and shared `.learnings/` |
+
+## Stackability Contract (Standalone + Multi-Skill)
+
+This skill is standalone-compatible and stackable with other self-improving skills.
+
+### Namespaced Logging (recommended for 2+ skills)
+- Namespace for this skill: `.learnings/robotics/`
+- Keep current standalone behavior if you prefer flat files.
+- Optional shared index for all skills: `.learnings/INDEX.md`
+
+### Required Metadata
+Every new entry must include:
+
+```markdown
+**Skill**: robotics
+```
+
+### Hook Arbitration (when 2+ skills are enabled)
+- Use one dispatcher hook as the single entrypoint.
+- Dispatcher responsibilities: route by matcher, dedupe repeated events, and rate-limit reminders.
+- Suggested defaults: dedupe key = `event + matcher + file + 5m_window`; max 1 reminder per skill every 5 minutes.
+
+### Narrow Matcher Scope (robotics)
+Only trigger this skill automatically for robotics signals such as:
+- `planner|localization|slam|trajectory|control loop`
+- `sensor fusion|actuator fault|sim2real|safety stop`
+- explicit robotics intent in user prompt
+
+### Cross-Skill Precedence
+When guidance conflicts, apply:
+1. `security`
+2. `engineering`
+3. `coding`
+4. `ai`
+5. user-explicit domain skill
+6. `meta` as tie-breaker
+
+### Ownership Rules
+- This skill writes only to `.learnings/robotics/` in stackable mode.
+- It may read other skill folders for cross-linking, but should not rewrite their entries.

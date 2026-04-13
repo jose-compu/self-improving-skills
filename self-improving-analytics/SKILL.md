@@ -594,3 +594,43 @@ When an analytics learning is valuable enough to become a reusable skill, extrac
 **Track learnings in repo** (team-wide): don't add to `.gitignore` — learnings become shared knowledge.
 
 **Hybrid** (track templates, ignore entries): ignore `.learnings/*.md`, keep `.learnings/.gitkeep`.
+
+## Stackability Contract (Standalone + Multi-Skill)
+
+This skill is standalone-compatible and stackable with other self-improving skills.
+
+### Namespaced Logging (recommended for 2+ skills)
+- Namespace for this skill: `.learnings/analytics/`
+- Keep current standalone behavior if you prefer flat files.
+- Optional shared index for all skills: `.learnings/INDEX.md`
+
+### Required Metadata
+Every new entry must include:
+
+```markdown
+**Skill**: analytics
+```
+
+### Hook Arbitration (when 2+ skills are enabled)
+- Use one dispatcher hook as the single entrypoint.
+- Dispatcher responsibilities: route by matcher, dedupe repeated events, and rate-limit reminders.
+- Suggested defaults: dedupe key = `event + matcher + file + 5m_window`; max 1 reminder per skill every 5 minutes.
+
+### Narrow Matcher Scope (analytics)
+Only trigger this skill automatically for analytics signals such as:
+- `pipeline|etl|schema drift|metric mismatch|dashboard`
+- `lineage|warehouse|bi|attribution|anomaly`
+- explicit analytics intent in user prompt
+
+### Cross-Skill Precedence
+When guidance conflicts, apply:
+1. `security`
+2. `engineering`
+3. `coding`
+4. `ai`
+5. user-explicit domain skill
+6. `meta` as tie-breaker
+
+### Ownership Rules
+- This skill writes only to `.learnings/analytics/` in stackable mode.
+- It may read other skill folders for cross-linking, but should not rewrite their entries.

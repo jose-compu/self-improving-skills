@@ -21,6 +21,7 @@ mkdir -p .learnings
 Never overwrite existing files. This is a no-op if `.learnings/` is already initialised.
 
 Do not log proprietary supplier pricing, negotiated contract terms, or customer-identifiable order data. Prefer aggregated metrics and redacted summaries over raw PO numbers or customer names.
+This skill is documentation-only: it does not execute purchases, place orders, trigger procurement transactions, or call external payment systems.
 
 If you want automatic reminders, use the opt-in hook workflow described in [Hook Integration](#hook-integration).
 
@@ -438,7 +439,7 @@ If logging something similar to an existing entry:
 Review `.learnings/` at natural breakpoints:
 
 ### When to Review
-- Before placing large purchase orders
+- Before finalizing replenishment plans
 - After month-end demand review
 - When the same disruption type appears again
 - Quarterly during S&OP planning cycle
@@ -593,3 +594,43 @@ When a supply chain learning is valuable enough to become a reusable skill, extr
 **Keep learnings local** (per-team): add `.learnings/` to `.gitignore`.
 **Track learnings in repo** (organization-wide): don't gitignore — learnings become shared operational knowledge.
 **Hybrid**: gitignore `.learnings/*.md` but keep `.learnings/.gitkeep`.
+
+## Stackability Contract (Standalone + Multi-Skill)
+
+This skill is standalone-compatible and stackable with other self-improving skills.
+
+### Namespaced Logging (recommended for 2+ skills)
+- Namespace for this skill: `.learnings/supply-chain/`
+- Keep current standalone behavior if you prefer flat files.
+- Optional shared index for all skills: `.learnings/INDEX.md`
+
+### Required Metadata
+Every new entry must include:
+
+```markdown
+**Skill**: supply-chain
+```
+
+### Hook Arbitration (when 2+ skills are enabled)
+- Use one dispatcher hook as the single entrypoint.
+- Dispatcher responsibilities: route by matcher, dedupe repeated events, and rate-limit reminders.
+- Suggested defaults: dedupe key = `event + matcher + file + 5m_window`; max 1 reminder per skill every 5 minutes.
+
+### Narrow Matcher Scope (supply-chain)
+Only trigger this skill automatically for supply-chain signals such as:
+- `lead time|stockout|safety stock|supplier delay|fill rate`
+- `forecast bias|otif|procurement|lane disruption|inventory`
+- explicit supply-chain intent in user prompt
+
+### Cross-Skill Precedence
+When guidance conflicts, apply:
+1. `security`
+2. `engineering`
+3. `coding`
+4. `ai`
+5. user-explicit domain skill
+6. `meta` as tie-breaker
+
+### Ownership Rules
+- This skill writes only to `.learnings/supply-chain/` in stackable mode.
+- It may read other skill folders for cross-linking, but should not rewrite their entries.

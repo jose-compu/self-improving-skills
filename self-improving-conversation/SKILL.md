@@ -595,3 +595,43 @@ Quick prompts for Copilot users:
 - "Log this dialogue issue"
 - "Create a skill from this conversation pattern"
 - "Check .learnings/ for related dialogue issues"
+
+## Stackability Contract (Standalone + Multi-Skill)
+
+This skill is standalone-compatible and stackable with other self-improving skills.
+
+### Namespaced Logging (recommended for 2+ skills)
+- Namespace for this skill: `.learnings/conversation/`
+- Keep current standalone behavior if you prefer flat files.
+- Optional shared index for all skills: `.learnings/INDEX.md`
+
+### Required Metadata
+Every new entry must include:
+
+```markdown
+**Skill**: conversation
+```
+
+### Hook Arbitration (when 2+ skills are enabled)
+- Use one dispatcher hook as the single entrypoint.
+- Dispatcher responsibilities: route by matcher, dedupe repeated events, and rate-limit reminders.
+- Suggested defaults: dedupe key = `event + matcher + file + 5m_window`; max 1 reminder per skill every 5 minutes.
+
+### Narrow Matcher Scope (conversation)
+Only trigger this skill automatically for conversation signals such as:
+- `tone mismatch|intent miss|hallucination|rephrase|clarification loop`
+- `escalation needed|user frustration|context loss`
+- explicit conversation intent in user prompt
+
+### Cross-Skill Precedence
+When guidance conflicts, apply:
+1. `security`
+2. `engineering`
+3. `coding`
+4. `ai`
+5. user-explicit domain skill
+6. `meta` as tie-breaker
+
+### Ownership Rules
+- This skill writes only to `.learnings/conversation/` in stackable mode.
+- It may read other skill folders for cross-linking, but should not rewrite their entries.

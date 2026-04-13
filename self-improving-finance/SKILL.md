@@ -598,3 +598,43 @@ When a finance learning is valuable enough to become a reusable skill, extract i
 ## Gitignore Options
 
 Add `.learnings/` to `.gitignore` for local-only; omit for org-wide sharing; or ignore `*.md` but keep `.gitkeep` for a hybrid approach.
+
+## Stackability Contract (Standalone + Multi-Skill)
+
+This skill is standalone-compatible and stackable with other self-improving skills.
+
+### Namespaced Logging (recommended for 2+ skills)
+- Namespace for this skill: `.learnings/finance/`
+- Keep current standalone behavior if you prefer flat files.
+- Optional shared index for all skills: `.learnings/INDEX.md`
+
+### Required Metadata
+Every new entry must include:
+
+```markdown
+**Skill**: finance
+```
+
+### Hook Arbitration (when 2+ skills are enabled)
+- Use one dispatcher hook as the single entrypoint.
+- Dispatcher responsibilities: route by matcher, dedupe repeated events, and rate-limit reminders.
+- Suggested defaults: dedupe key = `event + matcher + file + 5m_window`; max 1 reminder per skill every 5 minutes.
+
+### Narrow Matcher Scope (finance)
+Only trigger this skill automatically for finance signals such as:
+- `reconciliation|journal entry|close process|variance|materiality`
+- `sox control|audit evidence|cash flow|forecast miss`
+- explicit finance intent in user prompt
+
+### Cross-Skill Precedence
+When guidance conflicts, apply:
+1. `security`
+2. `engineering`
+3. `coding`
+4. `ai`
+5. user-explicit domain skill
+6. `meta` as tie-breaker
+
+### Ownership Rules
+- This skill writes only to `.learnings/finance/` in stackable mode.
+- It may read other skill folders for cross-linking, but should not rewrite their entries.
