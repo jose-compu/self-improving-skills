@@ -524,8 +524,6 @@ This injects a coding-focused learning evaluation reminder after each prompt (~5
 }
 ```
 
-Enable `PostToolUse` only if you want the hook to inspect command output for lint errors, type mismatches, and runtime exceptions.
-
 ### Available Hook Scripts
 
 | Script | Hook Type | Purpose |
@@ -563,9 +561,7 @@ When a coding learning is valuable enough to become a reusable skill, extract it
 
 ### Extraction Detection Triggers
 
-**In conversation**: "This bug keeps happening", "Save this pattern as a skill", "I keep forgetting this idiom", "Every project has this issue".
-
-**In entries**: Multiple `See Also` links, high priority + resolved, `idiom_gap` or `anti_pattern` with broad applicability, same `Pattern-Key` across projects.
+Use conversation signals ("This bug keeps happening", "Save this pattern as a skill") and entry signals (multiple `See Also`, high-priority resolved items, recurring `Pattern-Key`) to identify extraction candidates.
 
 ## Multi-Agent Support
 
@@ -581,13 +577,9 @@ When a coding learning is valuable enough to become a reusable skill, extract it
 1. **Log immediately** — context fades fast after debugging sessions
 2. **Include minimal code snippets** — before/after examples are most useful
 3. **Specify the language** — patterns differ between Python, TypeScript, Rust, etc.
-4. **Link to the offending line** — include file path and line number
-5. **Suggest concrete prevention** — a lint rule is better than "be careful"
-6. **Distinguish root cause from symptom** — the error message is the symptom, not the cause
-7. **Record what you tried** — failed debugging approaches are valuable for playbooks
-8. **Promote aggressively** — if a pattern recurs twice, it deserves a lint rule
-9. **Review before coding in same area** — check `.learnings/` for past issues in the module
-10. **Test your fix** — mark resolved only after verification
+4. **Suggest concrete prevention** — a lint rule is better than "be careful"
+5. **Distinguish root cause from symptom** — the error message is the symptom, not the cause
+6. **Test your fix** — mark resolved only after verification
 
 ## Gitignore Options
 
