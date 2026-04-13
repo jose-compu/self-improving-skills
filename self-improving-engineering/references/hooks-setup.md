@@ -4,15 +4,15 @@ Configure automatic engineering self-improvement triggers for AI coding agents.
 
 ## Overview
 
-Hooks enable proactive engineering learning capture by injecting reminders at key moments:
-- **UserPromptSubmit**: Reminder after each prompt to evaluate architecture decisions, build issues, test gaps
-- **PostToolUse (Bash)**: Error detection when builds fail, tests break, or dependency audits flag issues
+Hooks can help capture engineering learnings with minimal overhead:
+- **UserPromptSubmit** (recommended): Reminder after each prompt to evaluate architecture decisions, build issues, and test gaps
+- **PostToolUse (Bash)** (optional): Error-pattern reminder based on command output in trusted environments
 
 ## Claude Code Setup
 
 ### Option 1: Project-Level Configuration
 
-Create `.claude/settings.json` in your project root:
+Create `.claude/settings.json` in your project root (activator-only recommended):
 
 ```json
 {
@@ -27,7 +27,18 @@ Create `.claude/settings.json` in your project root:
           }
         ]
       }
-    ],
+    ]
+  }
+}
+```
+
+### Optional: Add PostToolUse Error Detector
+
+Enable this only when you explicitly want command-output pattern checks:
+
+```json
+{
+  "hooks": {
     "PostToolUse": [
       {
         "matcher": "Bash",
@@ -137,7 +148,7 @@ Consider logging the learning to `.learnings/` using the format from the self-im
 
 ### Test Error Detector Hook
 
-1. Enable PostToolUse hook for Bash
+1. Enable PostToolUse hook for Bash (optional setup above)
 2. Run a command that fails: `npm run build` on a broken build
 3. Verify you see `<engineering-error-detected>` reminder
 
@@ -199,7 +210,7 @@ The activator is designed to be lightweight:
 
 - Hook scripts run with the same permissions as Claude Code
 - Scripts only output text; they don't modify files or run commands
-- Error detector reads `CLAUDE_TOOL_OUTPUT` environment variable
+- Error detector reads `CLAUDE_TOOL_OUTPUT` environment variable when PostToolUse is enabled
 - Treat `CLAUDE_TOOL_OUTPUT` as potentially sensitive; do not log or forward it verbatim
 - All scripts are opt-in (you must configure them explicitly)
 - Recommended default: enable `UserPromptSubmit` only

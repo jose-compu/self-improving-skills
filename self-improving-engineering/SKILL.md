@@ -23,7 +23,7 @@ Never overwrite existing files. This is a no-op if `.learnings/` is already init
 
 Do not log secrets, tokens, private keys, environment variables, or full config files unless the user explicitly asks for that level of detail. Prefer short summaries or redacted excerpts over raw command output or full stack traces.
 
-If you want automatic reminders or setup assistance, use the opt-in hook workflow described in [Hook Integration](#hook-integration).
+Use a manual-first workflow by default. If you want reminders, use the opt-in hook workflow described in [Hook Integration](#hook-integration).
 
 ## Quick Reference
 
@@ -102,7 +102,7 @@ When learnings prove broadly applicable, promote them to workspace files:
 
 ### Optional: Enable Hook
 
-For automatic reminders at session start:
+For lightweight reminders at session start (recommended: activator only):
 
 ```bash
 cp -r hooks/openclaw ~/.openclaw/hooks/self-improving-engineering
@@ -511,7 +511,12 @@ Don't add to .gitignore — learnings become shared engineering knowledge.
 
 ## Hook Integration
 
-Enable automatic reminders through agent hooks. This is **opt-in** — you must explicitly configure hooks.
+Enable reminders through agent hooks only when needed. This is **opt-in** — you must explicitly configure hooks.
+
+### Conservative Mode (Recommended)
+
+- Default to **no hooks** and log manually; if reminders are useful, enable `UserPromptSubmit` with `scripts/activator.sh` only.
+- Enable `PostToolUse` (`scripts/error-detector.sh`) only in trusted environments when you explicitly want command-output pattern checks.
 
 ### Quick Setup (Claude Code / Codex)
 
@@ -531,9 +536,9 @@ Create `.claude/settings.json` in your project:
 }
 ```
 
-This injects an engineering learning evaluation reminder after each prompt (~50-100 tokens overhead).
+This injects a lightweight engineering learning reminder after each prompt (~50-100 tokens overhead).
 
-For advanced setup with `PostToolUse` error detection, see `references/hooks-setup.md`.
+For advanced setup with `PostToolUse` error detection, see `references/hooks-setup.md`. Keep it disabled unless you explicitly want tool-output pattern checks.
 
 | Script | Hook Type | Purpose |
 |--------|-----------|---------|
