@@ -70,5 +70,7 @@ CLAUDE_TOOL_OUTPUT="deadlock and unresolved redline" bash ./skills/self-improvin
 
 ## Safety
 
+Keep this file in the **project** (`.claude/settings.json`). Do not install user-level hooks.
 Hook scripts do not execute agreement actions.
 They only emit reminders to log and review negotiation patterns.
+Do not log BATNA values, pricing floors, confidential terms, or transcripts.

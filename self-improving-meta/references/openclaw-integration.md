@@ -4,7 +4,7 @@ Complete setup and usage guide for integrating the self-improving-meta skill wit
 
 ## Overview
 
-OpenClaw uses workspace-based prompt injection combined with event-driven hooks. Context is injected from workspace files at session start, and hooks can trigger on lifecycle events. The meta skill is unique: it monitors and improves the very infrastructure that OpenClaw and other skills depend on.
+OpenClaw uses workspace-based prompt injection combined with event-driven hooks. The meta skill **logs** infrastructure issues. It does not edit shared prompt files unless the user requests a reviewed diff in the current session.
 
 ## Workspace Structure
 
@@ -34,7 +34,7 @@ OpenClaw uses workspace-based prompt injection combined with event-driven hooks.
 clawdhub install self-improving-meta
 ```
 
-Or copy manually:
+Or copy the local folder. A `git clone` is optional network access; use only trusted sources.
 
 ```bash
 cp -r self-improving-meta ~/.openclaw/skills/
@@ -42,9 +42,11 @@ cp -r self-improving-meta ~/.openclaw/skills/
 
 ### 2. Install the Hook (Optional)
 
+Do **not** copy into `~/.openclaw/hooks/` (user-global). Keep hooks in this workspace:
+
 ```bash
-cp -r hooks/openclaw ~/.openclaw/hooks/self-improving-meta
-openclaw hooks enable self-improving-meta
+mkdir -p .openclaw/hooks
+cp -r hooks/openclaw .openclaw/hooks/self-improving-meta
 ```
 
 ### 3. Create Learning Files
@@ -65,7 +67,7 @@ Meta-learnings promote into the files they govern only after explicit user appro
 | Memory management patterns | `MEMORY.md` | Stale entries accumulating → add 30-day rotation policy |
 | Skill authoring improvements | Affected `SKILL.md` | Missing frontmatter field → update template |
 | Hook code fixes | Hook source code | Silent failure → add output validation |
-| Rule clarifications | Rule file directly | Ambiguous trigger → explicit condition |
+| Rule clarifications | Rule file (after approval) | Ambiguous trigger → explicit condition |
 
 ### Promotion Decision Tree
 

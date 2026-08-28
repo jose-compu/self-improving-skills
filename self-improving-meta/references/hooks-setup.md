@@ -19,7 +19,7 @@ Create `.claude/settings.json` in your project root (activator-only recommended)
   "hooks": {
     "UserPromptSubmit": [
       {
-        "matcher": "hook|skill|AGENTS|SOUL|TOOLS|MEMORY|CLAUDE|rule|prompt|frontmatter",
+        "matcher": "self-improving-meta|prompt-governance|stackability|instruction.ambiguity|rule.conflict|context.bloat",
         "hooks": [
           {
             "type": "command",
@@ -63,7 +63,7 @@ Do **not** install this hook globally. User-level hooks persist across all repos
   "hooks": {
     "UserPromptSubmit": [
       {
-        "matcher": "hook|skill|AGENTS|SOUL|TOOLS|MEMORY|CLAUDE|rule|prompt|frontmatter",
+        "matcher": "self-improving-meta|prompt-governance|stackability|instruction.ambiguity|rule.conflict|context.bloat",
         "hooks": [
           {
             "type": "command",
@@ -85,7 +85,7 @@ For lower overhead, use only the UserPromptSubmit hook:
   "hooks": {
     "UserPromptSubmit": [
       {
-        "matcher": "hook|skill|AGENTS|SOUL|TOOLS|MEMORY|CLAUDE|rule|prompt|frontmatter",
+        "matcher": "self-improving-meta|prompt-governance|stackability|instruction.ambiguity|rule.conflict|context.bloat",
         "hooks": [
           {
             "type": "command",
@@ -107,7 +107,7 @@ Codex uses the same hook system. Create `.codex/settings.json`:
   "hooks": {
     "UserPromptSubmit": [
       {
-        "matcher": "hook|skill|AGENTS|SOUL|TOOLS|MEMORY|CLAUDE|rule|prompt|frontmatter",
+        "matcher": "self-improving-meta|prompt-governance|stackability|instruction.ambiguity|rule.conflict|context.bloat",
         "hooks": [
           {
             "type": "command",
@@ -192,7 +192,7 @@ Never use an empty matcher. If the activator still feels intrusive:
 
 ```json
 {
-  "matcher": "hook|skill|AGENTS|SOUL|TOOLS|MEMORY|CLAUDE|rule|prompt",
+  "matcher": "self-improving-meta|prompt-governance|stackability|instruction.ambiguity|rule.conflict|context.bloat",
   "hooks": [...]
 }
 ```

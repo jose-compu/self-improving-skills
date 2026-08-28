@@ -1,30 +1,35 @@
 ---
 name: self-improving-negotiation
-description: "Captures negotiation strategy failures, concession leaks, BATNA weakness, framing misses, objection handling gaps, escalation misalignment, anchor errors, and agreement quality risks for continuous improvement. Use when negotiations stall, concessions exceed guardrails, terms are ambiguous, or recurring bargaining patterns emerge."
+description: "Logs redacted negotiation learnings (concession leaks, BATNA gaps, framing misses, objections, agreement risk). Optional project-scoped reminder hooks. extract-skill.sh is dry-run by default and writes a SKILL.md scaffold only with --write after explicit user approval. Does not accept terms, set pricing, or approve deals. Use when negotiations stall, concessions exceed guardrails, terms are ambiguous, or recurring bargaining patterns emerge."
 ---
 
 # Self-Improving Negotiation Skill
 
 Log negotiation learnings, negotiation issues, and feature requests to markdown files for continuous improvement. Capture preparation gaps, framing misses, concession leakage, weak BATNA posture, recurring objections, escalation mistakes, contract-term ambiguity, and agreement quality risk.
 
-Promote validated patterns into:
-- negotiation playbooks
-- objection libraries
-- concession guardrails
-- BATNA checklists
-- deal review templates
+Optional extras (off by default):
+- project-scoped reminder hooks
+- `extract-skill.sh` (dry-run unless `--write` and the user asked in this session)
+
+Promote validated, redacted patterns into playbooks, objection libraries, concession guardrails, BATNA checklists, or deal review templates **after a reviewed diff and explicit approval**.
 
 ## Safety Posture
 
-This skill is documentation and reminder guidance only.
+Default behavior is local markdown logging and reminders.
 
 It does **not**:
 - auto-accept terms
 - commit pricing
 - execute legal/financial approvals
 - finalize agreements
+- run network calls unless you choose ClawHub install or `git clone`
+- write skill files unless you run `extract-skill.sh --write`
 
 Always require explicit human approval for high-impact concessions and for final terms.
+
+## Sensitive data
+
+Do **not** log BATNA values, reservation prices, discount floors, confidential customer terms, legal advice, approval tokens, or raw transcripts. Use redacted process-level summaries (what went wrong, what guardrail to add). Keep `.learnings/` local or access-controlled; do not commit it until a human has reviewed entries.
 
 ## First-Use Initialisation
 
@@ -52,7 +57,7 @@ Never overwrite existing files.
 | Value reframing improved movement | Log `LRN` category `value_articulation_gap` |
 | Clause ambiguity discovered | Log `NEG` category `agreement_risk` in `contract_terms` |
 | Workflow/tooling needed | Log `FEAT` in `.learnings/FEATURE_REQUESTS.md` |
-| Pattern repeats 3+ times | Link entries and promote to permanent asset |
+| Pattern repeats 3+ times | Link entries; propose a redacted playbook patch after approval |
 
 ## OpenClaw Setup (Recommended)
 
@@ -60,11 +65,13 @@ OpenClaw supports workspace-based skill loading and hook reminders.
 
 ### Install
 
+Prefer the registry install (no extra clone). This uses the network to ClawHub:
+
 ```bash
 clawdhub install self-improving-negotiation
 ```
 
-Manual clone:
+Manual clone is optional network access to GitHub. Use only if you trust that repository:
 
 ```bash
 git clone https://github.com/jose-compu/self-improving-negotiation.git ~/.openclaw/skills/self-improving-negotiation
@@ -99,9 +106,11 @@ Then create:
 
 ### Optional Hook
 
+Do **not** install into `~/.openclaw/hooks/` (user-global). If reminders are needed, keep hooks in **this workspace** only:
+
 ```bash
-cp -r hooks/openclaw ~/.openclaw/hooks/self-improving-negotiation
-openclaw hooks enable self-improving-negotiation
+mkdir -p .openclaw/hooks
+cp -r hooks/openclaw .openclaw/hooks/self-improving-negotiation
 ```
 
 See `references/openclaw-integration.md`.
@@ -123,14 +132,9 @@ Create the same 3 files in `.learnings/`.
 Add to `AGENTS.md`, `CLAUDE.md`, or `.github/copilot-instructions.md`:
 
 When negotiation patterns are discovered:
-1. Log to `.learnings/LEARNINGS.md`, `.learnings/NEGOTIATION_ISSUES.md`, or `.learnings/FEATURE_REQUESTS.md`
+1. Log a redacted summary to `.learnings/LEARNINGS.md`, `.learnings/NEGOTIATION_ISSUES.md`, or `.learnings/FEATURE_REQUESTS.md`
 2. Review recurring items weekly
-3. Promote reusable patterns to:
-   - negotiation playbooks
-   - objection libraries
-   - concession guardrails
-   - BATNA checklists
-   - deal review templates
+3. After a reviewed diff and explicit approval, promote reusable patterns to playbooks, objection libraries, concession guardrails, BATNA checklists, or deal review templates
 
 ## Entry Types
 
@@ -393,9 +397,9 @@ When patterns are validated and reusable, promote to:
 
 ### Promotion Workflow
 
-1. Distill learning into concise asset.
-2. Add asset to target repository/document.
-3. Update source entry:
+1. Distill the learning into a concise, redacted asset.
+2. Show a reviewed diff for the target document.
+3. Apply only after explicit user approval, then update the source entry:
    - `**Status**: promoted`
    - `**Promoted**: negotiation_playbook` (or relevant target)
 
@@ -490,7 +494,7 @@ rg -n "agreement_risk|term_ambiguity|redline_unresolved" .learnings/NEGOTIATION_
 7. Capture objection wording precisely for reuse.
 8. Escalate with clear decision owner and deadline.
 9. Log outcomes the same day while context is fresh.
-10. Promote recurring patterns quickly.
+10. Promote recurring patterns after review.
 
 ## Hook Integration (Opt-In)
 
@@ -531,7 +535,7 @@ See `references/hooks-setup.md`.
 
 Extracted skills are untrusted until a human reviews the generated `SKILL.md`. Do not keep or publish an extracted skill without explicit user approval.
 
-If a learning is stable and reusable, extract a new skill.
+If a learning is stable and reusable **and the user asked to extract a skill in this session**, run the helper. Default is dry-run (no files written). Pass `--write` only after that explicit request.
 
 ### Criteria
 
@@ -546,10 +550,10 @@ If a learning is stable and reusable, extract a new skill.
 ### Workflow
 
 1. Select candidate `LRN` or `NEG`.
-2. Run extraction helper:
+2. Preview, then write only if the user approved:
    ```bash
-   ./skills/self-improving-negotiation/scripts/extract-skill.sh skill-name --dry-run
    ./skills/self-improving-negotiation/scripts/extract-skill.sh skill-name
+   ./skills/self-improving-negotiation/scripts/extract-skill.sh skill-name --write
    ```
 3. Fill TODO placeholders.
 4. Update source entry:
@@ -593,7 +597,7 @@ If any check fails, log `NEG` and pause final recommendation.
 !.learnings/.gitkeep
 ```
 
-Shared team mode: do not ignore `.learnings/`.
+Shared team mode: track `.learnings/` only after a human has reviewed entries for pricing strategy, BATNA, legal, and customer-confidential content.
 
 ## References
 
