@@ -152,8 +152,11 @@ Propose recurring patterns as reviewed diffs; apply to prompt files only after e
 
 ### Dry Run Extract Script
 
+Default is preview. Write files only with `--write` after an explicit request:
+
 ```bash
-./skills/self-improving-meta/scripts/extract-skill.sh test-skill --dry-run
+./skills/self-improving-meta/scripts/extract-skill.sh test-skill
+./skills/self-improving-meta/scripts/extract-skill.sh test-skill --write
 ```
 
 ## Troubleshooting

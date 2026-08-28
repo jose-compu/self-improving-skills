@@ -1,6 +1,6 @@
 ---
 name: self-improving-meta
-description: "Logs agent-infrastructure issues (prompt drift, rule conflicts, hook failures, context bloat). Default is log-only. Optional project-scoped hooks fire only on explicit meta signals such as self-improving-meta, prompt-governance, or stackability. Does not edit AGENTS.md, SOUL.md, TOOLS.md, MEMORY.md, hooks, or skills unless the user requests a reviewed diff in the current session. Use when prompt-file instructions are misread, a hook fails, a skill does not activate, rules conflict, prompt files waste context, memory is stale, or a skill template is incomplete."
+description: "Logs agent-infrastructure issues (prompt drift, rule conflicts, hook failures, context bloat). Default is log-only. Claude/Codex project hooks fire only on explicit meta signals (self-improving-meta, prompt-governance, stackability). The optional OpenClaw agent:bootstrap hook is session-start and not matcher-gated; if enabled it injects a log-only reminder and must not edit files. Does not edit AGENTS.md, SOUL.md, TOOLS.md, MEMORY.md, hooks, or skills unless the user requests a reviewed diff in the current session. Use when prompt-file instructions are misread, a hook fails, a skill does not activate, rules conflict, prompt files waste context, memory is stale, or a skill template is incomplete."
 ---
 
 # Self-Improving Meta Skill
@@ -106,7 +106,12 @@ When meta-learnings prove broadly applicable, promote them to the files they gov
 
 ### Optional: Enable Hook
 
-Do **not** install into `~/.openclaw/hooks/` (user-global). If reminders are needed, keep hooks in **this workspace** only:
+Two different hook modes exist. Do not mix their semantics:
+
+1. **Claude Code / Codex** (recommended if you want automation): matcher-gated, project `.claude/settings.json` / `.codex/settings.json`. Fires only on explicit meta signals.
+2. **OpenClaw `agent:bootstrap`** (optional): **not matcher-gated**. If enabled, it injects a log-only reminder at main-session start. It does not edit files. Skip it unless you want that reminder.
+
+Do **not** install into `~/.openclaw/hooks/` (user-global). If you enable the OpenClaw hook, keep it in **this workspace** only:
 
 ```bash
 mkdir -p .openclaw/hooks
@@ -545,10 +550,10 @@ When a meta-learning is valuable enough to become a reusable skill, extract it. 
 ### Extraction Workflow
 
 1. **Identify candidate**: Learning meets extraction criteria
-2. **Run helper** (or create manually):
+2. Preview, then write only if the user approved `--write` in this session:
    ```bash
-   ./skills/self-improving-meta/scripts/extract-skill.sh skill-name --dry-run
    ./skills/self-improving-meta/scripts/extract-skill.sh skill-name
+   ./skills/self-improving-meta/scripts/extract-skill.sh skill-name --write
    ```
 3. **Customize SKILL.md**: Fill in template with infrastructure-specific content
 4. **Update learning**: Set status to `promoted_to_skill`, add `Skill-Path`

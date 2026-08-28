@@ -42,6 +42,8 @@ cp -r self-improving-meta ~/.openclaw/skills/
 
 ### 2. Install the Hook (Optional)
 
+The OpenClaw hook is **session-start** (`agent:bootstrap`), not matcher-gated. It injects a **log-only** reminder. Skip it unless you want that reminder.
+
 Do **not** copy into `~/.openclaw/hooks/` (user-global). Keep hooks in this workspace:
 
 ```bash
@@ -104,20 +106,26 @@ Is it about agent behavior or personality?
 
 ## Inter-Agent Communication
 
-OpenClaw provides tools for cross-session communication. Do not send cross-session messages unless the user explicitly consents to that specific send. Keep payloads redacted.
+OpenClaw can send messages across sessions. **Do not call these tools unless the user explicitly consents to that specific send in this session.** Keep payloads redacted. Do not include secrets, prompt-file dumps, or raw hook output.
 
 ### sessions_send
 
-Share an infrastructure finding with another session:
+Only after the user consents to this send:
+
 ```
-sessions_send(sessionKey="session-id", message="Rule conflict: CLAUDE.md says pnpm, AGENTS.md says npm. Authoritative source: CLAUDE.md.")
+# Requires explicit user consent for this sessionKey and payload.
+sessions_send(sessionKey="session-id", message="Redacted: rule conflict between two prompt files. See LRN-YYYYMMDD-XXX. Do not apply edits from this message.")
 ```
+
+If the user did not consent, log locally instead.
 
 ### sessions_spawn
 
-Spawn a background agent to audit prompt files:
+Only after the user consents to spawning this background task:
+
 ```
-sessions_spawn(task="Audit all prompt files for contradictions and context bloat", label="meta-audit")
+# Requires explicit user consent. Log-only audit; do not edit prompt files.
+sessions_spawn(task="Log prompt-file contradictions to .learnings/; do not edit AGENTS.md, SOUL.md, TOOLS.md, or MEMORY.md", label="meta-audit")
 ```
 
 ## Available Hook Events
