@@ -7,6 +7,8 @@
 set -e
 
 OUTPUT="${CLAUDE_TOOL_OUTPUT:-}"
+# Scan a bounded prefix in memory only. Never print, store, or forward command output.
+OUTPUT="${OUTPUT:0:2000}"
 
 ERROR_PATTERNS=(
     "ETL"

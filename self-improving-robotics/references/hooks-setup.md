@@ -27,17 +27,6 @@ Create `.claude/settings.json` in your project root:
           }
         ]
       }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "./skills/self-improving-robotics/scripts/error-detector.sh"
-          }
-        ]
-      }
     ]
   }
 }

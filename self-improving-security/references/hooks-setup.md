@@ -32,27 +32,9 @@ Create `.claude/settings.json` in your project root (activator-only recommended)
 }
 ```
 
-### Optional: Add PostToolUse Error Detector
+### Command output detection
 
-Enable this only when you explicitly want command-output pattern checks in trusted environments:
-
-```json
-{
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "./skills/self-improving-security/scripts/error-detector.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
+Leave PostToolUse disabled. Do not attach `error-detector.sh` to every Bash call.
 
 ### Option 2: User-Level Configuration (discouraged)
 
