@@ -25,17 +25,6 @@ Create `.claude/settings.json`:
           }
         ]
       }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "./skills/self-improving-business/scripts/error-detector.sh"
-          }
-        ]
-      }
     ]
   }
 }

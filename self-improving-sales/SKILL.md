@@ -54,6 +54,8 @@ clawdhub install self-improving-sales
 git clone https://github.com/jose-compu/self-improving-sales.git ~/.openclaw/skills/self-improving-sales
 ```
 
+Manual clone is optional. Check out a reviewed tag or commit before use. Do not install an unpinned default branch into a shared environment.
+
 ### Workspace Structure
 
 OpenClaw injects these files into every session:
@@ -98,11 +100,11 @@ When sales learnings prove broadly applicable, promote them:
 
 ### Optional: Enable Hook
 
-Opt-in and project-scoped. Enabling a hook persists across future sessions; skip this unless you need reminders:
+Opt-in and workspace-local. Do not copy this hook to `~/.openclaw/hooks/` (that path is user-global). Skip it unless you want reminders in this workspace:
 
 ```bash
-cp -r hooks/openclaw ~/.openclaw/hooks/self-improving-sales
-openclaw hooks enable self-improving-sales
+mkdir -p .openclaw/hooks
+cp -r hooks/openclaw .openclaw/hooks/self-improving-sales
 ```
 
 See `references/openclaw-integration.md` for complete details.
@@ -513,13 +515,12 @@ Create `.claude/settings.json` in your project:
 ```json
 {
   "hooks": {
-    "UserPromptSubmit": [{"matcher": "deal|pipeline|forecast|objection|competitor|pricing|quota|MEDDIC", "hooks": [{"type": "command", "command": "./skills/self-improving-sales/scripts/activator.sh"}]}],
-    "PostToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "./skills/self-improving-sales/scripts/error-detector.sh"}]}]
+    "UserPromptSubmit": [{"matcher": "deal|pipeline|forecast|objection|competitor|pricing|quota|MEDDIC", "hooks": [{"type": "command", "command": "./skills/self-improving-sales/scripts/activator.sh"}]}]
   }
 }
 ```
 
-The `UserPromptSubmit` hook injects a sales-focused reminder (~50-100 tokens). The `PostToolUse` hook detects deal-related signals (lost deals, churn, competitor mentions, forecast misses). Use only `UserPromptSubmit` for lower overhead.
+The `UserPromptSubmit` hook injects a sales-focused reminder. Leave PostToolUse disabled.
 
 ### Available Hook Scripts
 
@@ -640,7 +641,7 @@ When guidance conflicts, apply:
 
 ### Ownership Rules
 - This skill writes only to `.learnings/sales/` in stackable mode.
-- It may read other skill folders for cross-linking, but should not rewrite their entries.
+- Do not read other skill folders, their SKILL.md files, or their log entries.
 - Standalone mode writes to this project's `.learnings/*.md` log files only.
 - Stackable mode writes only to the namespaced folder above and must not rewrite other skills' log entries.
 - Promotion into `AGENTS.md`, `SOUL.md`, `TOOLS.md`, `MEMORY.md`, rules, hooks, or generated skills is not a logging write. Show a reviewed diff and apply only after explicit user approval.

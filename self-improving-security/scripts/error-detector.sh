@@ -7,6 +7,8 @@
 set -e
 
 OUTPUT="${CLAUDE_TOOL_OUTPUT:-}"
+# Scan a bounded prefix in memory only. Never print, store, or forward command output.
+OUTPUT="${OUTPUT:0:2000}"
 
 # If hook context didn't provide output, do nothing.
 [ -n "$OUTPUT" ] || exit 0

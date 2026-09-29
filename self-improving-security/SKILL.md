@@ -79,6 +79,8 @@ clawdhub install self-improving-security
 git clone https://github.com/jose-compu/self-improving-security.git ~/.openclaw/skills/self-improving-security
 ```
 
+Manual clone is optional. Check out a reviewed tag or commit before use. Do not install an unpinned default branch into a shared environment.
+
 ### Workspace Structure
 
 OpenClaw injects these files into every session:
@@ -123,11 +125,11 @@ When security learnings prove broadly applicable, promote them:
 
 ### Optional: Enable Hook
 
-Opt-in and project-scoped. Enabling a hook persists across future sessions; skip this unless you need reminders:
+Opt-in and workspace-local. Do not copy this hook to `~/.openclaw/hooks/` (that path is user-global). Skip it unless you want reminders in this workspace:
 
 ```bash
-cp -r hooks/openclaw ~/.openclaw/hooks/self-improving-security
-openclaw hooks enable self-improving-security
+mkdir -p .openclaw/hooks
+cp -r hooks/openclaw .openclaw/hooks/self-improving-security
 ```
 
 See `references/openclaw-integration.md` for complete details.
@@ -467,7 +469,7 @@ Hooks persist across sessions once installed. Keep them **project-scoped**. Do *
 
 ### Conservative Mode (Recommended)
 - Default to manual logging (no hooks); if reminders are useful, enable `UserPromptSubmit` with `scripts/activator.sh` only.
-- Enable `PostToolUse` (`scripts/error-detector.sh`) only in trusted environments when you explicitly want command-output pattern checks.
+- Leave PostToolUse disabled. Do not attach error-detector.sh to every Bash call.
 
 ### Quick Setup (Claude Code / Codex)
 
@@ -497,13 +499,6 @@ Create `.claude/settings.json` in your project:
       "hooks": [{
         "type": "command",
         "command": "./skills/self-improving-security/scripts/activator.sh"
-      }]
-    }],
-    "PostToolUse": [{
-      "matcher": "Bash",
-      "hooks": [{
-        "type": "command",
-        "command": "./skills/self-improving-security/scripts/error-detector.sh"
       }]
     }]
   }
@@ -641,7 +636,7 @@ When guidance conflicts, apply:
 
 ### Ownership Rules
 - This skill writes only to `.learnings/security/` in stackable mode.
-- It may read other skill folders for cross-linking, but should not rewrite their entries.
+- Do not read other skill folders, their SKILL.md files, or their log entries.
 - Standalone mode writes to this project's `.learnings/*.md` log files only.
 - Stackable mode writes only to the namespaced folder above and must not rewrite other skills' log entries.
 - Promotion into `AGENTS.md`, `SOUL.md`, `TOOLS.md`, `MEMORY.md`, rules, hooks, or generated skills is not a logging write. Show a reviewed diff and apply only after explicit user approval.
